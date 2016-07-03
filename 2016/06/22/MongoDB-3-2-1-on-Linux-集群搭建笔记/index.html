@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<!--[if lte IE 8 ]>
+<html class="ie" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<!--
+***************  *      *     *
+      8          *    *       *
+      8          *  *         *
+      8          **           *
+      8          *  *         *
+      8          *    *       *
+      8          *      *     *
+      8          *        *   ***********    -----Theme By Kieran(http://go.kieran.top)
+-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<!--<![endif]-->
+
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><title>MongoDB 3.2.1 on Linux 集群搭建笔记 | iNg&#39;s Homepage</title>
+  <!-- Meta data -->
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content="iNg's Homepage">
+    <meta name="author" content="Wenxi Wu">
+    <meta name="description" content="I'm Ng, intelligent Ng, ingenuous Ng." />
+    <meta name="keywords" content="" />
+
+    <!-- Favicon, (keep icon in root folder) -->
+    <link rel="Shortcut Icon" href="/img/favicon.ico" type="image/ico">
+
+    <link rel="alternate" href="/atom.xml" title="iNg&#39;s Homepage" type="application/atom+xml">
+    <link rel="stylesheet" href="/css/all.css" media="screen" type="text/css">
+	
+    <link rel="stylesheet" href="/highlightjs/vs.css" type="text/css">
+    
+    
+
+    <!-- Custom stylesheet, (add custom styles here, always load last) -->
+    <!-- Load our stylesheet for IE8 -->
+    <!--[if IE 8]>
+    <link rel="stylesheet" type="text/css" href="/css/ie8.css" />
+    <![endif]-->
+
+    <!-- Google Webfonts (Monserrat 400/700, Open Sans 400/600) -->
+    <link href='//fonts.useso.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link href='//fonts.useso.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+
+    <!-- Load our fonts individually if IE8+, to avoid faux bold & italic rendering -->
+    <!--[if IE]>
+    <link href='http://fonts.useso.com/css?family=Montserrat:400' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.useso.com/css?family=Montserrat:700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.useso.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.useso.com/css?family=Open+Sans:600' rel='stylesheet' type='text/css'>
+    <![endif]-->
+
+    <!-- jQuery | Load our jQuery, with an alternative source fallback to a local version if request is unavailable -->
+    <script src="/js/jquery-1.11.1.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/jquery-1.11.1.min.js"><\/script>')</script>
+
+    <!-- Load these in the <head> for quicker IE8+ load times -->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv.min.js"></script>
+    <script src="/js/respond.min.js"></script>
+    <![endif]-->
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+  
+  <style>.col-md-8.col-md-offset-2.opening-statement img{display:none;}</style><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<!--
+<body class="post-template">
+ <!-- hexo-inject:begin --><!-- hexo-inject:end -->-->
+<body id="index" class="lightnav animsition">
+
+      <!-- ============================ Off-canvas navigation =========================== -->
+
+    <div class="sb-slidebar sb-right sb-style-overlay sb-momentum-scrolling">
+        <div class="sb-close" aria-label="Close Menu" aria-hidden="true">
+            <img src="/img/close.png" alt="Close"/>
+        </div>
+        <!-- Lists in Slidebars -->
+        <ul class="sb-menu">
+            <li><a href="/" class="animsition-link" title="Home">Home</a></li>
+            <li><a href="/archives" class="animsition-link" title="archive">archives</a></li>
+            <!-- Dropdown Menu -->
+			 
+            
+        	<li>
+        		<a class="sb-toggle-submenu">Categories<span class="sb-caret"></span></a>
+            	<ul class="sb-submenu">
+				  	
+				    <li><a href="/categories/Fequent-Questions-and-Answers/" class="animsition-link">FQA<small>(1)</small></a></li>
+				    
+				    <li><a href="/categories/reading-notes/" class="animsition-link">ReadingNotes<small>(3)</small></a></li>
+				    
+				    <li><a href="/categories/tools/" class="animsition-link">Tools<small>(2)</small></a></li>
+				    
+				</ul>
+        	</li>
+			
+            
+            <li>
+                <a class="sb-toggle-submenu">Links<span class="sb-caret"></span></a>
+                <ul class="sb-submenu">
+                    
+                    <li><a href="http://ss.sysu.edu.cn/~ll/" class="animsition-link">Liang Lin</a></li>
+                    
+                    <li><a href="https://vision.sysu.edu.cn" class="animsition-link">HCP Lab</a></li>
+                    
+                    <li><a href="http://zhangliliang.com/" class="animsition-link">Liliang.Z</a></li>
+                    
+                    <li><a href="http://blog.cvmarcher.com/" class="animsition-link">Zhujin.L</a></li>
+                    
+                    <li><a href="http://rayz0620.github.io/" class="animsition-link">Rui Zhang</a></li>
+                    
+                </ul>
+            </li>
+            
+        </ul>
+        <!-- Lists in Slidebars -->
+        <ul class="sb-menu secondary">
+            <li><a href="/about.html" class="animsition-link" title="about">About</a></li>
+            <li><a href="/atom.xml" class="animsition-link" title="rss">RSS</a></li>
+        </ul>
+    </div>
+    
+    <!-- ============================ END Off-canvas navigation =========================== -->
+
+    <!-- ============================ #sb-site Main Page Wrapper =========================== -->
+
+    <div id="sb-site">
+        <!-- #sb-site - All page content should be contained within this id, except the off-canvas navigation itself -->
+
+        <!-- ============================ Header & Logo bar =========================== -->
+
+        <div id="navigation" class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <!-- Nav logo -->
+                    <div class="logo">
+                        <a href="/" title="Logo" class="animsition-link">
+                        
+                        </a>
+                    </div>
+                    <!-- // Nav logo -->
+                    <!-- Info-bar -->
+                    <nav>
+                        <ul class="nav">
+                            <li><a href="/" class="animsition-link">iNg's Homepage</a></li>
+                            <li class="nolink">SYSU HCP LAB</li>
+                            <li class="nolink"><span>Welcome!</span></li>
+                        </ul>
+                    </nav>
+                    <!--// Info-bar -->
+                </div>
+                <!-- // .container -->
+                <div class="learnmore sb-toggle-right">More</div>
+                <button type="button" class="navbar-toggle menu-icon sb-toggle-right" title="More">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar before"></span>
+                <span class="icon-bar main"></span>
+                <span class="icon-bar after"></span>
+                </button>
+            </div>
+            <!-- // .navbar-inner -->
+        </div>
+
+        <!-- ============================ Header & Logo bar =========================== -->
+
+        <!-- ============================ Hero Image =========================== -->
+
+        <section id="hero" class="scrollme">
+            <div class="container-fluid element-img" style="background: url(/img/bg.jpg) no-repeat center center fixed;background-size: cover">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 vertical-align cover boost text-center">
+                        <div class="center-me animateme" data-when="exit" data-from="0" data-to="0.6" data-opacity="0" data-translatey="100">
+                            <div>
+                            	
+                                <h2><span>Always be with </span>hope, faith, courage<span> and </span>patience.</h2>
+                                <p></p>
+				    			
+                                <h2></h2>
+                                <p>I'm Ng, intelligent Ng, ingenuous Ng.</p>
+				    			
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- // .col-md-12 -->
+                </div>
+                <div class="herofade beige-dk"></div>
+            </div>
+        </section>
+
+        <!-- Height spacing helper -->
+        <div class="heightblock"></div>
+        <!-- // End height spacing helper -->
+
+        <!-- ============================ END Hero Image =========================== -->
+      
+<section id="intro">
+    <div class="container">
+        <div class="row col-md-offset-2">
+            <div class="col-md-8">
+    			<span class="post-meta">
+      <time datetime="2016-06-21T17:40:16.000Z" itemprop="datePublished">
+          2016-06-22
+      </time>
+    
+    
+    | 
+    <a href='/tags/Software/'>Software</a>
+    
+    
+</span>
+                <h1>MongoDB 3.2.1 on Linux 集群搭建笔记</h1>
+            </div>
+        </div>
+        <div class="col-md-8 col-md-offset-2">
+      		<p>最近为了做《高级数据库》的大作业，在本地找了几台机器，搭了一个MongoDB集群。由于时间关系，先把重点mark下来，以后再完善。</p>
+<h2 id="1-MongoDB-版本-3-2"><a href="#1-MongoDB-版本-3-2" class="headerlink" title="1. MongoDB 版本 3.2"></a>1. MongoDB 版本 3.2</h2><p>安装方法见官网<a href="https://docs.mongodb.org/manual/administration/install-on-linux/" target="_blank" rel="external">Install MongoDB Community Edition on Linux</a>，每个节点都要安装。</p>
+<h2 id="2-机器资源"><a href="#2-机器资源" class="headerlink" title="2. 机器资源"></a>2. 机器资源</h2><p>共6台：Ubuntu14.04 <em> 4 + CentOS </em> 2<br>分别命名为<code>N1~N6</code>。</p>
+<h2 id="3-步骤"><a href="#3-步骤" class="headerlink" title="3. 步骤"></a>3. 步骤</h2><p>3.1 配置ReplicaSet(Deploy a Replica Set)<br>计划是配置3个RelicaSets：</p>
+<p><center>rs0=N1+N2<br>port: 27017；<br>rs1=N3+N4<br>port  27018；<br>rs2=N5+N6<br>port  27019。</center><br>以上的 port 好像是可以一样的，时间关系，当时没试。</p>
+<p>接下来在每台机子上操作：</p>
+<p>3.1.1 启动mongod<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"># N1 &amp; N2 : </div><div class="line">mongod --replSet &quot;rs0&quot; --port 27017</div><div class="line"># N3 &amp; N4 : </div><div class="line">mongod --replSet &quot;rs1&quot; --port 27018</div><div class="line"># N5 &amp; N6 : </div><div class="line">mongod --replSet &quot;rs2&quot; --port 27019</div></pre></td></tr></table></figure></p>
+<p>3.1.2 打开mongo shell<br>随便在<em>每一个Replica Set</em>里，选一个节点，另开一个终端，打开mongo shell，指令如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"># N1 或 N2: </div><div class="line">mongo --port 27017</div><div class="line"># N3 或 N4: </div><div class="line">mongo --port 27018</div><div class="line"># N5 或 N6: </div><div class="line">mongo --port 27019</div></pre></td></tr></table></figure></p>
+<p>3.1.3 初始化Replica Set<br>在每个一个Replica Set打开的mongo shell里，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"># N1: </div><div class="line">rs.initiate(&#123;</div><div class="line">   _id: &quot;rs0&quot;,</div><div class="line">   version: 1,</div><div class="line">   members: [</div><div class="line">      &#123; _id: 0, host: &quot;N1:27017&quot; &#125;,</div><div class="line">      &#123; _id: 1, host: &quot;N2:27017&quot; &#125;,</div><div class="line">   ]</div><div class="line">&#125;)</div><div class="line"># N3: </div><div class="line">rs.initiate(&#123;</div><div class="line">   _id: &quot;rs1&quot;,</div><div class="line">   version: 1,</div><div class="line">   members: [</div><div class="line">      &#123; _id: 0, host: &quot;N3:27018&quot; &#125;,</div><div class="line">      &#123; _id: 1, host: &quot;N4:27018&quot; &#125;,</div><div class="line">   ]</div><div class="line">&#125;)</div><div class="line"># N5: </div><div class="line">rs.initiate(&#123;</div><div class="line">   _id: &quot;rs2&quot;,</div><div class="line">   version: 1,</div><div class="line">   members: [</div><div class="line">      &#123; _id: 0, host: &quot;N5:27018&quot; &#125;,</div><div class="line">      &#123; _id: 1, host: &quot;N6:27018&quot; &#125;,</div><div class="line">   ]</div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
+<p>如果成功的话，会在mongo shell里看到有<code>{...&quot;ok&quot;: 1... }</code>之类的字眼出现。也可以在打开的mongo shell里用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rs.conf()</div></pre></td></tr></table></figure></p>
+<p>查看Replica Set的状态</p>
+<p>3.2 配置ConfigRepiSet<br>计划是用原先N1～N6中其中三台机器来搭。<br>ConfigRepliSet = N1 + N2 + N3<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># N1 &amp; N2 &amp; N3: </div><div class="line">mongod --configsvr --replSet configReplSet --port 21870</div></pre></td></tr></table></figure></p>
+<p>类似地，打开一个新的终端，连到N1、N2、N3其中一个，打开mongo shell:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mongo --host N1 --port 21870</div></pre></td></tr></table></figure></p>
+<p>初始化ConfigReliSet :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">rs.initiate( &#123;</div><div class="line">   _id: &quot;configReplSet&quot;,</div><div class="line">   configsvr: true,</div><div class="line">   version: 1,</div><div class="line">   members: [</div><div class="line">      &#123; _id: 0, host: &quot;N1:21870&quot; &#125;,</div><div class="line">      &#123; _id: 1, host: &quot;N2:21870&quot; &#125;,</div><div class="line">      &#123; _id: 2, host: &quot;N3:21870&quot; &#125;,</div><div class="line">   ]</div><div class="line">&#125; )</div></pre></td></tr></table></figure></p>
+<p>启动mongos Instance，其实就是再打开一个终端，输入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mongos --configdb configReplSet/N1:21870,N2:21870,N3:21870 --port 21871</div></pre></td></tr></table></figure></p>
+<p>3.3 配置Sharding<br>上面打开mongos Instance之后，先不要关掉。再开一个终端，连接到configRepliSet其中一个节点(N1或N2或N3)，但端口要用“21871”<br>以N1为例，命令是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mongo --host N1 --port 21871</div></pre></td></tr></table></figure></p>
+<p>连上之后，可以在mongo shell 里往集群添加shard。这里用的shard，就是上面配的ReplicaSet（就是rs0，rs1，rs2这三个）<br>对于每一个ReplicaSet，只需要添加一个节点进去集群就行了。如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sh.addShard( &quot;rs0/N1:27017&quot; )</div><div class="line">sh.addShard( &quot;rs1/N3:27018&quot; )</div><div class="line">sh.addShard( &quot;rs2/N5:27019&quot; )</div></pre></td></tr></table></figure></p>
+<p>然后就完事了。到这里，MongoDB集群就算是搭好了。</p>
+<p><center><strong> ！！！注意！！！</strong> </center><br>这只是我个人一个简单的记录，后面我会找时间完善好，这里可能会存在非常多的问题，希望有大牛可以指正，让我学习学习。如果有读者要参考这篇来搭的话，建议慎重考虑！可以把这篇当成辅助理解的材料，主要还是以官网的方法为主。MongoDB 3.2版本搭建起来感觉要比旧版本那些要简单一些，但网上找到的教程多数都是旧版本的。于是草草地摸索了一下。欢迎跟大家交流。</p>
+
+            <div class="clearfix"></div>
+            <hr class="nogutter">
+        </div>
+        <nav class="pagination" role="pagination">
+    
+    <a class="pull-left" href="/2016/06/22/End-to-End-Comparative-Attention-Networks-for-Person-Re-identification/" style="float: left;">
+        ← End-to-End Comparative Attention Networks for Person Re-identification
+    </a>
+    
+    
+    <a class="pull-right" href="/2016/06/22/Caffe-Ubuntu14-04配置-updated-2016-06-30/">
+        Caffe + Ubuntu14.04配置(updated:2016/06/30) →
+    </a>
+    
+</nav>
+
+        <div class="duoshuo">
+<div class="ds-thread" data-thread-key="2016/06/22/MongoDB-3-2-1-on-Linux-集群搭建笔记/" data-title="MongoDB 3.2.1 on Linux 集群搭建笔记" data-url="http://yoursite.com/2016/06/22/MongoDB-3-2-1-on-Linux-集群搭建笔记/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"duoshuo_name"};
+(function() {
+	var ds = document.createElement('script');
+	ds.type = 'text/javascript';ds.async = true;
+	ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+	ds.charset = 'UTF-8';
+	(document.getElementsByTagName('head')[0] 
+	 || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();
+</script>
+</div>
+    </div>
+</section>
+
+
+      
+<!-- ============================ Footer =========================== -->
+
+<footer>
+    <div class="container">
+            <div class="copy">
+                <p>
+                    &copy; 2014<script>new Date().getFullYear()>2010&&document.write("-"+new Date().getFullYear());</script>, Content By Wenxi Wu. All Rights Reserved.
+                </p>
+                <p>Theme By <a href="//go.kieran.top" style="color: #767D84">Kieran</a></p>
+            </div>
+            <div class="social">
+                <ul>
+                    
+                    <li><a href="https://github.com/" title="Github" target="_blank"><i class="icon-github"></i></a>&nbsp;</li>
+                    
+                    
+                    <li><a href="https://twitter.com/" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>&nbsp;</li>
+                    
+                    
+                    <li><a href="https://www.facebook.com/" title="Facebook" target="_blank"><i class="icon-facebook"></i></a>&nbsp;</li>
+                    
+                    
+                    <li><a href="https://google.com/" title="Google-Plus" target="_blank"><i class="icon-google-plus"></i></a>&nbsp;</li>
+                    
+                    
+                    <li><a href="http://weibo.com/" title="Sina-Weibo" target="_blank"><i class="icon-sina-weibo"></i></a>&nbsp;</li>
+                    
+                </ul>
+            </div>
+            <div class="clearfix"> </div>
+        </div>
+</footer>
+
+<!-- ============================ END Footer =========================== -->
+      <!-- Load our scripts -->
+        
+<!-- Resizable 'on-demand' full-height hero -->
+<script type="text/javascript">
+    
+    var resizeHero = function () {
+        var hero = $(".cover,.heightblock"),
+            window1 = $(window);
+        hero.css({
+            "height": window1.height()
+        });
+    };
+    
+    resizeHero();
+    
+    $(window).resize(function () {
+        resizeHero();
+    });
+</script>
+<script src="/js/plugins.min.js"></script><!-- Bootstrap core and concatenated plugins always load here -->
+<script src="/js/jquery.flexslider-min.js"></script><!-- Flexslider plugin -->
+<script src="/js/scripts.js"></script><!-- Theme scripts -->
+
+<!-- Initiate flexslider plugin -->
+<script type="text/javascript">
+    $(document).ready(function($) {
+      $('.flexslider').flexslider({
+        animation: "fade",
+        prevText: "",
+        nextText: "",
+        directionNav: true
+      });
+    });
+</script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>

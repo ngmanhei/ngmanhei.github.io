@@ -1,309 +1,190 @@
-function dispatch () {
-  var url;
-  var searchbox = $('#searchbox');
-  var searchval = searchbox.val();
-  if (searchval !== '') {
-    url = 'http://www.google.com/search?q=site:qcyoung.com/%20' + searchval;
-    if (navigator.userAgent.indexOf('iPad') > -1 || navigator.userAgent.indexOf('iPhone') > -1) {
-      location.href = url;
-    } else {
-      window.open(url, '_blank');
-    }
-  }
-  return false;
-}
+$(document).ready(function($) {
+    "use strict";
 
-
-
-$(document).ready(function ($) {
-  /**
-   * plugins list
-   * @type {
-   *   jquery:[nicescroll,slidebars,animsition,Bootstrap Auto-Hiding Navbar,pace]
-   * }
-   */
-  var windowHeight = $(window).height();
-  var windowWidth = $(window).width();
-  var documentHeight = $(document).height();
-  var footerHeight = $('footer').outerHeight();
-  var tocHeight;
-  var duoshuoMark;
-  var egglayer;
-  var gPushed = false;
-  var msViewportStyle;
-  var wallNumber;
-  var scrollStatus;
-  var scrollTop;
-  var tocScroll;
-  var tocs;
-  if ($('#toc').length) {
-    tocHeight = $('.toc').outerHeight();
-    duoshuoMark = $('.duoshuo').offset().top;
-  }
-  var a = {
-    info: '卧槽，你居然敢点开控制台看我的代码，这下我的屎代码无所遁形了 T _ T',
-    logo: '         _.-.  \n' + '       ,\'/ //\\ \n' + '      /// // /)\n' + '     /// // //|\n' + '    /// // /// \n' + '   /// // ///  \n' + '  (`: // ///   \n' + '   `;`: ///    \n' + '   / /  `\'      \n' + '  / /\n' + ' (_/  \n'
-  };
-  window.console && console.info && console.info(a.logo + a.info);
-
-  document.onkeydown = function (e) {
-    if (!($(':focus').prop('tagName') === 'INPUT') && !($(':focus').prop('tagName') === 'TEXTAREA')) {
-      e = e || window.event;
-      if (e.keyCode === 191 && e.shiftKey) {
-        if (windowWidth < 1024) {
-          return false;
-        }
-        if ($('.layui-layer-shade').length > 0) {
-          return false;
+    $(window).scroll(function () {
+        if ($(document).scrollTop() > 10) {
+            $(".lightnav .navbar-inner").addClass("lightnav-alt");
+            $(".darknav .navbar-inner").addClass("darknav-alt");
         } else {
-          egglayer = layer.open({
-            type: 1,
-            title: false,
-            skin: 'layui-layer-demo', // 样式类名
-            closeBtn: false, // 不显示关闭按钮
-            shift: 5,
-            shadeClose: true, // 开启遮罩关闭
-            area: [windowWidth, windowHeight],
-            content: '<div class="egg-tips"><div class="egg-header"><span>彩蛋指南(仿Github —— 试着按下这些键)</span><span class="egg-close"><i class="demo-icon icon-cancel">&#xe808;</i></span> </div><div class="egg-helps"><table class="keyboard-map"><tbody><tr><th></th><th>快捷方式说明</th></tr><tr><td class="keys"><kbd>?</kbd></td><td>打开彩蛋说明</td></tr><tr><td class="keys"><kbd>g</kbd><kbd>s</kbd></td><td>定焦到搜索框</td></tr><tr><td class="keys"><kbd>g</kbd><kbd>a</kbd></td><td>打开归档页</td></tr><tr><td class="keys"><kbd>g</kbd><kbd>c</kbd></td><td>打开目录页</td></tr><tr><td class="keys"><kbd>g</kbd><kbd>t</kbd></td><td>打开标签页</td></tr></tbody></table></div></div>'
-          });
+            $(".lightnav .navbar-inner").removeClass("lightnav-alt");
+            $(".darknav .navbar-inner").removeClass("darknav-alt");
         }
-        gPushed = false;
-      } else if (e.keyCode === 71) { // g
-        gPushed = true;
-      } else if (e.keyCode === 65) { // angular.bind(self, function)
-        if (gPushed) {
-          location.href = '/archives';
-        }
-        gPushed = false;
-      } else if (e.keyCode === 67) { // c
-        if (gPushed) {
-          location.href = '/categories';
-        }
-        gPushed = false;
-      } else if (e.keyCode === 84) { // t
-        if (gPushed) {
-          location.href = '/tags';
-        }
-        gPushed = false;
-      } else if (e.keyCode === 83) { // S
-        if (gPushed) {
-          $('#searchbox').focus();
-          $('#searchbox').val('');
-        }
-        gPushed = false;
-        return false;
-      } else {
-        gPushed = false;
-      }
-    }
-  };
-  $(document).delegate('.egg-close', 'click', function () {
-    layer.close(egglayer);
-  });
-
-  // 开始进入时加载位置
-  scrollStatus = $(document).scrollTop();
-  if (scrollStatus > 10) {
-    $('.lightnav .navbar-inner').addClass('lightnav-alt');
-  } else {
-    $('.lightnav .navbar-inner').removeClass('lightnav-alt');
-  }
-
-  $(window).scroll(function () {
-    scrollTop = $(this).scrollTop();
-    if ($('#toc').length) {
-      var heads = $('.post-article').find('h1,h2,h3,h4,h5');
-      var nowtoc = 0;
-      for (var i = 0; i < heads.length; i++) {
-        if (heads[i].getBoundingClientRect().top <= 0) {
-          nowtoc = i;
-        } else {
-          break;
-        }
-      }
-      tocs = $('.toc').find('a');
-      $(tocs).removeClass('toc-active');
-      $(tocs[nowtoc]).addClass('toc-active');
-      tocScroll = tocs[nowtoc].offsetTop;
-      if (tocScroll > windowHeight / 2) {
-        $('#toc').scrollTop(tocScroll - windowHeight / 2);
-      }
-      if (tocHeight > windowHeight - footerHeight - 100) {
-        if (scrollTop > duoshuoMark - windowHeight) {
-          $('#toc').css({
-            'position': 'absolute',
-            'top': duoshuoMark - tocHeight
-          });
-        } else {
-          $('#toc').css({
-            'position': 'fixed',
-            'top': '50px'
-          });
-        }
-      }
-    }
-    if ($(document).scrollTop() > 10) {
-      $('.lightnav .navbar-inner').addClass('lightnav-alt');
-    } else {
-      $('.lightnav .navbar-inner').removeClass('lightnav-alt');
-    }
-  });
-
-  wallNumber = 'url(http://qcyoung.qiniudn.com/qcyoung/TKL/wall-' + Math.ceil(Math.random() * 132) + '.jpg)';
-  // wallNumber = "url(http://i2.buimg.com/7a5bdc5143c173c1.jpg)";
-  $('.element-img').css('background-image', wallNumber);
-
-  // 微信Window
-  $('#navigation .weixin,.social .weixin').bind('click', function () {
-    layer.open({
-      type: 1,
-      title: false,
-      skin: 'layui-layer-demo', // 样式类名
-      closeBtn: false, // 不显示关闭按钮
-      shift: 2,
-      shadeClose: true, // 开启遮罩关闭
-      area: [windowWidth, windowHeight],
-      content: '<img src="http://qcyoung.qiniudn.com/qcyoung/yangzj1992QRcode.jpg" width="200px" height="200px"/>'
     });
-  });
 
-  var scrollclick;
+	$(document).ready(function($) {
 
-  // 返回顶部功能
-  $(window).bind('scroll', function () {
-    var scrollTopNum;
-    var returnTop;
-    // 获取当前垂直位移值
-    if (!scrollclick) {
-      scrollTopNum = $(document).scrollTop();
-      // 获取浏览器当前高度
-      returnTop = $('div.control-panel');
-      // 滚动条垂直距离大于0时显示，反之隐藏
-      (scrollTopNum > 240) ? returnTop.fadeIn('fast') : returnTop.fadeOut('fast');
-    }
-  });
+		// Slidebars off-canvas menu
+		$.slidebars();
 
-  $('.icon-gotop').click(function () {
-    scrollclick = true;
-    $('div.control-panel').fadeOut('800');
-    $('html, body').animate({ scrollTop: 0 }, 800, function () {
-      scrollclick = false;
-    });
-    return false;
-  });
+		// Popovers [Hover]
+		$("[data-toggle=popover]")
+			.popover({
+				html:true
+			}
+		);
 
-  $('.icon-godown').click(function () {
-    scrollclick = true;
-    $('html, body').animate({ scrollTop: documentHeight }, 800, function () {
-      scrollclick = false;
-    });
-    return false;
-  });
+		$("html").niceScroll({
+			smoothscroll: true, // scroll with ease movement
+			autohidemode: false,
+			zindex: "100", // change z-index for scrollbar div
+        	scrollspeed: 60, // scrolling speed
+        	mousescrollstep: 40,
+        	gesturezoom: false,
+        	horizrailenabled: false,
+        	cursorcolor: "#151515",
+	        boxzoom: false,
+	        cursorborder: "0 solid #202020",
+	        cursorborderradius: "5px",
+	        cursorwidth: 9,
+	        enablemousewheel: true,
+	        background: "rgba(255,255,255,0.7)",
+		});
 
-  $('.icon-music').click(function () {
-    window.open('http://yangzj1992.u117.15800000.top/yPlayer/');
-  });
-  // Slidebars off-canvas menu
-  $.slidebars();
+		// Page transitions
+		$(".animsition").animsition({
 
-  $('#toc').niceScroll({
-    smoothscroll: true, // scroll with ease movement
-    autohidemode: true,
-    zindex: '100', // change z-index for scrollbar div
-    scrollspeed: 60, // scrolling speed
-    mousescrollstep: 40, // mouse scrolling speed
-    gesturezoom: false, // 上缩放框激活时，间距输出/输入
-    horizrailenabled: false, // 管理水平滚动
-    cursorcolor: '#151515',
-    boxzoom: false, // enable zoom for box content
-    cursorborder: '0px solid #202020',
-    cursorborderradius: '8px',
-    cursorwidth: 4, // 9
-    enablemousewheel: true,
-    background: 'rgba(255,255,255,0.7)'
-  });
-  $('html').niceScroll({
-    // smoothscroll: true, // scroll with ease movement
-    // autohidemode: false,
-    // zindex: "100", // change z-index for scrollbar div
-    // scrollspeed: 60, // scrolling speed
-    // mousescrollstep: 40,// mouse scrolling speed
-    // gesturezoom: false,//上缩放框激活时，间距输出/输入
-    // horizrailenabled: false,//管理水平滚动
-    // cursorcolor: "#151515",
-    // boxzoom: false,// enable zoom for box content
-    // cursorborder: "0px solid #202020",
-    // cursorborderradius: "5px",
-    cursorwidth: 0 // 9
-    // enablemousewheel: true,
-    // background: "rgba(255,255,255,0.7)",
-  });
+			inClass               :   'fade-in',
+			outClass              :   'fade-out-down-sm',
+			inDuration            :    900,
+			outDuration           :    800,
+			linkElement           :   '.animsition-link',
+			//e.g. linkElement   :   'a:not([target="_blank"]):not([href^=#])'
+			loading               :    true,
+			loadingParentElement  :   'body', //animsition wrapper element
+			loadingClass          :   'animsition-loading',
+			unSupportCss          : [ 'animation-duration',
+			                          '-webkit-animation-duration',
+			                          '-o-animation-duration'
+			                        ],
+			//"unSupportCss" option allows you to disable the "animsition" in case the css property in the array is not supported by your browser.
+			//The default setting is to disable the "animsition" in a browser that does not support "animation-duration".
 
-  // Page transitions
-  $('.animsition').animsition({
-    inClass: 'fade-in',
-    outClass: 'fade-out-down-sm',
-    inDuration: 500,
-    outDuration: 500,
-    linkElement: '.animsition-link',
-    // e.g. linkElement   :   'a:not([target="_blank"]):not([href^=#])'
-    loading: true,
-    loadingParentElement: 'body', // animsition wrapper element
-    loadingClass: 'animsition-loading',
-    unSupportCss: ['animation-duration', '-webkit-animation-duration', '-o-animation-duration'],
-    // "unSupportCss" option allows you to disable the "animsition"
-    // in case the css property in the array is not supported by your browser.
-    // The default setting is to disable the "animsition" in a browser
-    // that does not support "animation-duration".
-    overlay: false,
-    overlayClass: 'animsition-overlay-slide',
-    overlayParentElement: 'body'
-  });
+			overlay               :   false,
 
-  // Functionailty constraints for mobile(wall opacity covering layer)
-  if (!Modernizr.touch) {
-    jQuery(function ($) {
-      // Hero & page-header fade-in effect
-      var divs = $('.herofade');
-      $(window).on('scroll', function () {
-        var st = $(this).scrollTop();
-        divs.css({
-          'margin-top': -(st / 0) + 'px',
-          opacity: 0.7 - st / 1600
-        });
-      });
-    });
-  }
+			overlayClass          :   'animsition-overlay-slide',
+			overlayParentElement  :   'body'
+		});
 
-  // autohide navbar on scroll
-  $('div.navbar-fixed-top').autoHidingNavbar({
-    animationDuration: 400,
-    hideOffset: 0 // Hides the navbar after scrolling . auto means the navbar's height.
-  });
+		// WOW plugin settings
+        var wow = new WOW(
+          { animateClass: 'animated', // set our global css classT (default is animated)
+            offset: 250, // set distance to content until it triggers (default is 0)
+            mobile: false, // remove animations for mobiles/tablets (default is true)
+            live: true }); // act on asynchronously loaded content (default is true)
+        new WOW().init();
 
-  /*!
-   * IE10 viewport hack for Surface/desktop Windows 8 bug
-   * Copyright 2014 Twitter, Inc.
-   * Licensed under the Creative Commons Attribution 3.0 Unported License. For
-   * details, see http://creativecommons.org/licenses/by/3.0/.
-   */
-  // See the Getting Started docs for more information:
-  // http://getbootstrap.com/getting-started/#support-ie10-width
-  if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
-    msViewportStyle = document.createElement('style');
-    msViewportStyle.appendChild(
-      document.createTextNode(
-        '@-ms-viewport{width:auto!important}'
-      )
-    );
-    document.querySelector('head').appendChild(msViewportStyle);
-  }
+		// Functionailty constraints for mobile
+		if (!Modernizr.touch) {
+		    jQuery(function ($) {
+		        // Hero & page-header fade-in effect
+		        var divs = $('.herofade');
+		        $(window).on('scroll', function () {
+		            var st = $(this).scrollTop();
+		            divs.css({
+		                'margin-top': -(st / 0) + "px",
+                    'opacity': 0
+		                // 'opacity': 0.9 - st / 1600
+		            });
+		        });
+		    });
 
-  $('.logo').hover(function () {
-    $(this).find('#white-logo').css('display', 'none');
-    $(this).find('#brown-logo').css('display', 'block');
-  }, function () {
-    $(this).find('#brown-logo').css('display', 'none');
-    $(this).find('#white-logo').css('display', 'block');
-  });
+		    jQuery(function ($) {
+		        // Hero & page-header fade-in effect
+		        var divs = $('.videofade');
+		        $(window).on('scroll', function () {
+		            var st = $(this).scrollTop();
+		            divs.css({
+		                'margin-top': -(st / 0) + "px",
+		                'opacity': 0.8 - st / 1600
+		            });
+		        });
+		    });
+
+		    jQuery(function ($) {
+		        // Hero & page-header fade-in effect
+		        var divs = $('.headerfade');
+		        $(window).on('scroll', function () {
+		            var st = $(this).scrollTop();
+		            divs.css({
+		                'margin-top': -(st / 0) + "px",
+		                'opacity': 0.9 - st / 300
+		            });
+		        });
+		    });
+		}
+
+		// autohide navbar on scroll
+		$("div.navbar-fixed-top").autoHidingNavbar({
+			animationDuration: 400,
+			hideOffset: 0,
+		});
+
+		// faq's floating sidebar (left)
+	    $('#sidebar').affix({
+	    	offset: {
+	    		top: 500
+	    	}
+		});
+
+	    // Scrollspy for scrollto links in floating faq sidebar
+		var $body   = $(document.body);
+		var navHeight = $('.navbar').outerHeight(true) + 80;
+
+		$body.scrollspy({
+			target: '#leftcol',
+			offset: navHeight
+		});
+
+		// fade out map cover (contact.html)
+	    $(".map-cover").click(function () {
+	        $(".map-cover").fadeOut("slow");
+	    });
+
+		// Collapsible panels for faq's and careers
+	    $('.collapse').on('show.bs.collapse', function() {
+	        var id = $(this).attr('id');
+	        $('a[href="#' + id + '"]').closest('.panel-heading').addClass('active-panel');
+	        $('a[href="#' + id + '"] .panel-title span').html('<i class="glyphicon glyphicon-chevron-up"></i>');
+	    });
+	    $('.collapse').on('hide.bs.collapse', function() {
+	        var id = $(this).attr('id');
+	        $('a[href="#' + id + '"]').closest('.panel-heading').removeClass('active-panel');
+	        $('a[href="#' + id + '"] .panel-title span').html('<i class="glyphicon glyphicon-chevron-down"></i>');
+	    });
+
+	    /*!
+	     * IE10 viewport hack for Surface/desktop Windows 8 bug
+	     * Copyright 2014 Twitter, Inc.
+	     * Licensed under the Creative Commons Attribution 3.0 Unported License. For
+	     * details, see http://creativecommons.org/licenses/by/3.0/.
+	     */
+	    // See the Getting Started docs for more information:
+	    // http://getbootstrap.com/getting-started/#support-ie10-width
+	    if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+	        var msViewportStyle = document.createElement('style');
+	        msViewportStyle.appendChild(
+	            document.createTextNode(
+	                '@-ms-viewport{width:auto!important}'
+	            )
+	        );
+	        document.querySelector('head').appendChild(msViewportStyle);
+	    }
+
+	}); // Document Ready
+
 }(jQuery)); // End "use strict"
+
+// Enable dropdown sub-menus in off-canvas navigation
+$(document).ready(function($) {
+	$('.sb-toggle-submenu').off('click') // Stop submenu toggle from closing Slidebars.
+		.on('click', function() {
+			$submenu = $(this).parent().children('.sb-submenu');
+			$(this).add($submenu).toggleClass('sb-submenu-active'); // Toggle active class.
+
+			if ($submenu.hasClass('sb-submenu-active')) {
+			$submenu.slideDown(200);
+			} else {
+			$submenu.slideUp(200);
+		}
+	});
+});

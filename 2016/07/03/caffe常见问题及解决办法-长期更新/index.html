@@ -244,7 +244,7 @@
 <pre><code>CUDNN_DIR=/path/to/the/specific/version/of/CUDNN
 INCLUDE_DIRS := $(PYTHON_INCLUDE) $(CUDNN_DIR)/include
 LIBRARY_DIRS :=$(CUDNN_DIR)/lib64 $(PYTHON_LIB)
-</code></pre><p><strong> <em>这里要注意的是，<code>LIBRARY_DIRS</code>里面的<code>$(CUDNN_PATH)/lib64</code>最好放在最前面。</em> </strong><br>然后再make就可以了。<br>在用<code>.sh</code>脚本跑程序的时候，如果无法连接到libcudnn*的库，那么还需要在<code>.sh</code>的开头加上一行：</p>
+</code></pre><p><strong> <em>这里要注意的是，<code>LIBRARY_DIRS</code> 里面的 <code>$(CUDNN_PATH)/lib64</code> 最好放在最前面。</em> </strong><br>然后再make就可以了。<br>在用<code>.sh</code>脚本跑程序的时候，如果无法连接到libcudnn*的库，那么还需要在<code>.sh</code>的开头加上一行：</p>
 <pre><code>export LD_LIBRARY_PATH=/path/to/the/specific/version/of/CUDNN/lib64:$LD_LIBRARY_PATH
 </code></pre><hr>
 <center>…To be continue…</center>
